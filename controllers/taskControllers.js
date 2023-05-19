@@ -113,7 +113,25 @@ json = {
 const updateTask = async (req, res) => {
     
     const task_id = req.body.task_id;
-    //Write your code here.
+    const {token, heading,  description, status} = req.body;
+    try {
+      const updateOneTask = await Tasks.findOneAndUpdate(
+        { _id: task_id },
+        token,
+        heading,
+        description,
+        status,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      return res.status(200).json({status : 'success', data : updateOneTask})
+
+    } catch (error) {
+        return res.status(500).json({ message: error.message, status: 'fail' })
+    } //Write your code here.
+
 }
 
 
@@ -154,6 +172,13 @@ const deleteTask = async (req, res) => {
 
     const task_id = req.body.task_id;
     //Write your code here.
+    try {
+        const deleteOneTask = await Tasks.findOneAndDelete({_id : task_id});
+        return res.status(200).json({message: 'Task deleted successfully', status: 'success'})
+     } catch(error) {
+        return res.status(500).json({ message: error.message, status: 'fail' })
+
+     }
 
 }
 
