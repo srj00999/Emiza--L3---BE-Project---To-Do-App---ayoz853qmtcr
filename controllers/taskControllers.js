@@ -8,65 +8,41 @@ const JWT_SECRET = "newtonSchool";
 
 const createTask =async (req, res) => {
 
-    
-    try {
-        const { userId } = jwt.verify(token, JWT_SECRET);
-        console.log(userId);
-        const task = await Tasks.create({ heading, description, creator_id :userId });
+    //creator_id is user id who have created this task.
 
-        res.status(200).json( {"message": 'Task added successfully',
-        "task_id": task._id, //id of task that is created.
-        "status": 'success'})
-        // console.log(task);
-    } catch (error) {
-        // res.status(404).json({ error, status: 'fail' });
-        if (error.name === 'JsonWebTokenError') {
-            res.status(404).json({
-              message: 'Invalid token',
-              status: 'fail'
-            });
-          } else {
-            res.status(404).json({
-              message: error.message,
-              status: 'fail'
-            });
-        }
-    }}
+    const { heading, description, token  } = req.body;
+    let decodedToken;
+    try{
+        decodedToken = jwt.verify(token, JWT_SECRET);
+    }catch(err){
+        res.status(404).json({
+            "status": 'fail',
+            "message": 'Invalid token'
+        });
+    }
+    const creator_id = decodedToken.userId;
 
+    const newtask = {
+        heading,
+        description,
+        creator_id
+    };
 
-//     const { heading, description, token  } = req.body;
-//     let decodedToken;
-//     try{
-//         decodedToken = jwt.verify(token, JWT_SECRET);
-//     }catch(err){
-//         res.status(404).json({
-//             "status": 'fail',
-//             "message": 'Invalid token'
-//         });
-//     }
-//     const creator_id = decodedToken.userId;
+    try{
+        const task = await Tasks.create(newtask);
+        res.status(200).json({
+            message: 'Task added successfully',
+            task_id: task._id,
+            status: 'success'
+        });
+    }catch(error){
+        res.status(404).json({
+            status: 'fail',
+            message: error.message
+        });
+    };
 
-//     const newtask = {
-//         heading,
-//         description,
-//         creator_id
-//     };
-
-//     try{
-//         const task = await Tasks.create(newtask);
-//         res.status(200).json({
-//             message: 'Task added successfully',
-//             task_id: task._id,
-//             status: 'success'
-//         });
-//     }catch(error){
-//         res.status(404).json({
-//             status: 'fail',
-//             message: error.message
-//         });
-//     };
-
-// }
+}
 
 
 const getdetailTask = async (req, res) => {
