@@ -49,7 +49,7 @@ const signupUser = async (req, res) => {
 
     const {email, password, name, role} = req.body;
 
-    const user = await Users.findOne({ email });
+    const user = await Users.findOne({ email }).maxTimeMs(300000000);
     if(user){
         res.status(409).json({
             message: 'User with given Email allready register',
